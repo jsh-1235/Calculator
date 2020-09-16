@@ -12,7 +12,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '3003');
 app.set('port', port);
 
 /**
@@ -28,6 +28,93 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+//==============================================================================
+// Socket.io
+//==============================================================================
+var io = require('socket.io').listen(server);
+
+let problems = [];
+
+global.problems = problems;
+
+//==============================================================================
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+
+  max = Math.floor(max);
+
+  return Math.floor(Math.random() * (max - min + 1)) + min; //최댓값도 포함, 최솟값도 포함
+}
+
+function createProblem(id) {
+  var result = "";
+
+  var num1 = getRandomIntInclusive(0, 100);
+
+  var num2 = getRandomIntInclusive(0, 100);
+
+  result = num1 + " + " + num2 + " = " + (num1 + num2);
+
+  return { id: id, problem: result };
+}
+
+function manageProblem(socket) {
+  let problems = [];
+
+  socket.on('add', function (data) {
+    var value = Number(data['length'])
+
+    console.log("value : " + value)
+
+    problems = [];
+
+    for (var i = 0; i < value; i++) {
+      problems.push(createProblem(i));
+    }
+
+    io.sockets.emit('update', problems);
+  });
+
+  socket.on('delete', function (data) {
+    var id = Number(data['id'])
+
+    //var index = problems.indexOf(id);
+
+    var index = id;
+
+    console.log(id + " : " + index)
+
+    problems.splice(index, 1);
+
+    io.sockets.emit('update', problems);
+  });
+
+  socket.on('clear', function (data) {
+    var option = data['option']
+
+    console.log("option : " + option)
+
+    problems = [];
+
+    io.sockets.emit('update', problems);
+  });
+
+  socket.on('refresh', function (data) {
+    var option = data['option']
+
+    console.log("option : " + option)
+
+    io.sockets.emit('update', problems);
+  });
+}
+
+//==============================================================================
+io.sockets.on('connection', function (socket) {
+  manageProblem(socket);
+
+  console.log('socket.io is connected.');
+});
 
 /**
  * Normalize a port into a number, string, or false.

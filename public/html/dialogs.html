@@ -1,0 +1,44 @@
+<div class="modal fade" id="dialogAdd" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    aria-labelledby="dialogAddLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dialogAddLabel">Adding problems</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label id="inputLabel" for="formControlRange">1</label>
+                <input id="inputRange" type="range" class="form-control-range" id="formControlRange" min="1" max="10"
+                    value="1">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                    style="min-width: 100px;">Close</button>
+                <button id="dialog-add-ok" type="button" class="btn btn-primary" style="min-width: 100px;">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dialogDelete" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    aria-labelledby="dialogDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dialogDeleteLabel">Delete an problem</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="dialog-delete-content"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="dialog-delete-ok" type="button" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+</div>

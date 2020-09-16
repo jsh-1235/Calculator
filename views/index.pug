@@ -1,6 +1,102 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  p Hi
+  include ../public/html/dialogs.html   
+
+  div
+    button(id="btnAdd" type="button" class="btn btn-outline-primary mr-1" onclick='AddItem()')
+      div
+        span(id="spinner" class="spinner-border spinner-border-sm text-primary mr-1" role="status" aria-hidden="true")
+        span ADD
+
+    button(id="btnClear" type="button" class="btn btn-outline-primary mr-1" onclick='ClearItem()') CLEAR
+    hr
+    div
+      ul(id="list-content" class="list-group")
+
+block script
+  script.
+    var problems = [];
+
+    var socket = io();
+
+    function AddItem() {
+      $('#spinner').show('slow')
+
+      $('#dialogAdd').modal('show')
+    }
+
+    $("#dialog-add-ok").click(function () {
+      socket.emit('add', {
+        'length': $("#inputRange").val()
+      });
+
+      $('#dialogAdd').modal('hide')
+    });
+
+    function ClearItem() {
+      socket.emit('clear', {
+        'option': "clear all"
+      });
+    }
+
+    function deleteClick(id) {
+      //- var problems = JSON.parse('!{JSON.stringify(problems)}');
+
+      //- console.log(typeof(problems));          
+
+      $("#dialog-delete-content").text(problems[id].problem);
+
+      $("#dialog-delete-ok").attr("name", id.toString());
+
+      $('#dialogDelete').modal('show')
+    }
+
+    $("#dialog-delete-ok").click(function () {
+      $('#dialogDelete').modal('hide');
+
+      socket.emit('delete', {
+        'id': $("#dialog-delete-ok").attr("name")
+      });
+    });
+
+    socket.on('update', function (data) {
+      Refresh(data);
+
+      //console.log(problems);
+    });
+
+    function Refresh(data) {
+      $('#list-content').empty();
+
+      problems = [];
+
+      for (i = 0; i < data.length; i++) {
+        problems.push(data[i]);
+
+        var id = "'" + problems[i].id + "'";
+
+        $("#list-content").append('<li class="list-group-item d-flex justify-content-between align-items-center">' + problems[i].problem + '<button type="button" class="btn bg-danger text-white" onclick="deleteClick(' + id + ')">' + '<i class="far fa-trash-alt"></i>' + '</button>' + '</li>');
+      }
+
+      $('#spinner').hide('slow')
+    }
+
+    window.addEventListener("load", function () {
+      socket.emit('refresh', {
+        'option': "refresh"
+      });
+    });
+
+    $(document).ready(function () {
+      $('#spinner').hide('slow')
+
+      $('input[type=range]').on('input', function () {
+        $(this).trigger('change');
+      });
+
+      $("#inputRange").change(function () {
+        $("#inputLabel").html($("#inputRange").val());
+      });
+    });         
+
